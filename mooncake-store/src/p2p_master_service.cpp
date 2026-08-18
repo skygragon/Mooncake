@@ -28,7 +28,8 @@ P2PMasterService::P2PMasterService(const MasterServiceConfig& config)
 }
 
 ErrorCode P2PMasterService::RecordOplog(OpType type, const std::string& key,
-                                        const std::string& payload) {
+                                        const std::string& payload,
+                                        bool force_sync) {
     // TODO: Record remaining failover-visible P2P mutations: client crash
     // cleanup, heartbeat state transitions, replica eviction/rebalance, and
     // task metadata.
@@ -38,7 +39,8 @@ ErrorCode P2PMasterService::RecordOplog(OpType type, const std::string& key,
     }
 
     auto result = manager->AppendAndPersist(
-        type, key, payload, /*sync=*/!enable_async_oplog_write_);
+        type, key, payload,
+        /*sync=*/force_sync || !enable_async_oplog_write_);
     if (!result.has_value()) {
         LOG(ERROR) << "P2PMasterService: failed to persist oplog"
                    << ", op_type=" << static_cast<int>(type) << ", key=" << key
@@ -470,6 +472,15 @@ auto P2PMasterService::BatchGetWriteRoute(const BatchGetWriteRouteRequest& req)
 
 auto P2PMasterService::AddReplica(const AddReplicaRequest& req)
     -> tl::expected<void, ErrorCode> {
+    std::unique_lock<std::mutex> replay_lock(client_replay_apply_mutex_,
+                                             std::defer_lock);
+    if (req.client_mutation_id != 0) {
+        replay_lock.lock();
+        if (req.client_mutation_id <= GetClientLastMutationId(req.client_id)) {
+            return {};
+        }
+    }
+
     MetadataAccessorRW accessor(this, req.key);
     auto client = std::static_pointer_cast<P2PClientMeta>(
         client_manager_->GetClient(req.client_id));
@@ -478,14 +489,21 @@ auto P2PMasterService::AddReplica(const AddReplicaRequest& req)
                    << ", client_id: " << req.client_id;
         return tl::make_unexpected(ErrorCode::CLIENT_NOT_FOUND);
     }
-    return InnerAddReplica(accessor.GetShard().GetRef(), req.key, req.client_id,
-                           req.segment_id, req.size, client);
+    auto result = InnerAddReplica(
+        accessor.GetShard().GetRef(), req.key, req.client_id, req.segment_id,
+        req.size, client, req.client_mutation_id,
+        /*require_oplog_success=*/req.client_mutation_id != 0);
+    if (result.has_value() && req.client_mutation_id != 0) {
+        SetClientLastMutationId(req.client_id, req.client_mutation_id);
+    }
+    return result;
 }
 
 tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
     MetadataShard& shard, std::string_view key, const UUID& client_id,
     const UUID& segment_id, size_t size,
-    const std::shared_ptr<P2PClientMeta>& client) {
+    const std::shared_ptr<P2PClientMeta>& client, uint64_t client_mutation_id,
+    bool require_oplog_success) {
     auto segment_res = client->QuerySegment(segment_id);
     if (!segment_res.has_value()) {
         LOG(ERROR) << "fail to query segment"
@@ -518,6 +536,28 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
                 LOG(WARNING) << "replica has existed"
                              << ", key: " << key << ", client_id: " << client_id
                              << ", segment_id: " << segment_id;
+                if (require_oplog_success && client_mutation_id != 0) {
+                    AddReplicaPayload payload;
+                    payload.object_key = std::string(key);
+                    payload.client_id = client_id;
+                    payload.segment_id = segment_id;
+                    payload.size = size;
+                    payload.client_mutation_id = client_mutation_id;
+                    ErrorCode record_err = RecordOplog(
+                        OpType_ADD_REPLICA, payload.object_key,
+                        SerializeP2PPayload(payload), /*force_sync=*/true);
+                    if (record_err != ErrorCode::OK) {
+                        LOG(ERROR)
+                            << "AddReplica(P2P): failed to record duplicate "
+                               "oplog"
+                            << ", client_id=" << client_id
+                            << ", segment_id=" << segment_id
+                            << ", client_mutation_id=" << client_mutation_id
+                            << ", error=" << toString(record_err);
+                        return tl::make_unexpected(record_err);
+                    }
+                    return {};
+                }
                 return tl::make_unexpected(ErrorCode::REPLICA_ALREADY_EXISTS);
             }
         }
@@ -540,18 +580,23 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
         payload.client_id = client_id;
         payload.segment_id = segment_id;
         payload.size = size;
+        payload.client_mutation_id = client_mutation_id;
         AddReplicaToSegmentIndex(shard, it->first, new_replica);
         OnReplicaAdded(new_replica);
         metadata.replicas_.push_back(std::move(new_replica));
         ErrorCode record_err =
             RecordOplog(OpType_ADD_REPLICA, payload.object_key,
-                        SerializeP2PPayload(payload));
+                        SerializeP2PPayload(payload),
+                        /*force_sync=*/require_oplog_success);
         if (record_err != ErrorCode::OK) {
             LOG(ERROR) << "AddReplica(P2P): failed to record oplog"
                        << ", client_id=" << client_id
                        << ", segment_id=" << segment_id
                        << ", error=" << toString(record_err)
                        << "; keeping the in-memory route";
+            if (require_oplog_success) {
+                return tl::make_unexpected(record_err);
+            }
         }
     } else {
         std::vector<Replica> replicas;
@@ -563,6 +608,7 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
         payload.client_id = client_id;
         payload.segment_id = segment_id;
         payload.size = size;
+        payload.client_mutation_id = client_mutation_id;
         auto emplace_it =
             shard.metadata.emplace(std::string(key), std::move(new_meta)).first;
         AddReplicaToSegmentIndex(shard, emplace_it->first,
@@ -570,13 +616,17 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
         OnReplicaAdded(emplace_it->second->replicas_[0]);
         ErrorCode record_err =
             RecordOplog(OpType_ADD_REPLICA, payload.object_key,
-                        SerializeP2PPayload(payload));
+                        SerializeP2PPayload(payload),
+                        /*force_sync=*/require_oplog_success);
         if (record_err != ErrorCode::OK) {
             LOG(ERROR) << "AddReplica(P2P): failed to record oplog"
                        << ", client_id=" << client_id
                        << ", segment_id=" << segment_id
                        << ", error=" << toString(record_err)
                        << "; keeping the in-memory route";
+            if (require_oplog_success) {
+                return tl::make_unexpected(record_err);
+            }
         }
     }
     return {};
@@ -584,19 +634,55 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerAddReplica(
 
 auto P2PMasterService::RemoveReplica(const RemoveReplicaRequest& req)
     -> tl::expected<void, ErrorCode> {
+    std::unique_lock<std::mutex> replay_lock(client_replay_apply_mutex_,
+                                             std::defer_lock);
+    if (req.client_mutation_id != 0) {
+        replay_lock.lock();
+        if (req.client_mutation_id <= GetClientLastMutationId(req.client_id)) {
+            return {};
+        }
+    }
+
     MetadataAccessorRW accessor(this, req.key);
-    return InnerRemoveReplica(accessor.GetShard().GetRef(), req.key,
-                              req.client_id, req.segment_id);
+    auto result =
+        InnerRemoveReplica(accessor.GetShard().GetRef(), req.key, req.client_id,
+                           req.segment_id, req.client_mutation_id,
+                           /*require_oplog_success=*/true);
+    if (result.has_value() && req.client_mutation_id != 0) {
+        SetClientLastMutationId(req.client_id, req.client_mutation_id);
+    }
+    return result;
 }
 
 tl::expected<void, ErrorCode> P2PMasterService::InnerRemoveReplica(
     MetadataShard& shard, std::string_view key, const UUID& client_id,
-    const UUID& segment_id) {
+    const UUID& segment_id, uint64_t client_mutation_id,
+    bool require_oplog_success) {
     auto it = shard.metadata.find(key);
     if (it == shard.metadata.end()) {
         LOG(WARNING) << "object not found"
                      << ", key: " << key << ", client_id: " << client_id
                      << ", segment_id: " << segment_id;
+        if (require_oplog_success && client_mutation_id != 0) {
+            RemoveReplicaPayload payload;
+            payload.object_key = std::string(key);
+            payload.client_id = client_id;
+            payload.segment_id = segment_id;
+            payload.client_mutation_id = client_mutation_id;
+            ErrorCode record_err =
+                RecordOplog(OpType_REMOVE_REPLICA, payload.object_key,
+                            SerializeP2PPayload(payload), /*force_sync=*/true);
+            if (record_err != ErrorCode::OK) {
+                LOG(ERROR) << "RemoveReplica(P2P): failed to record missing "
+                              "object oplog"
+                           << ", client_id=" << client_id
+                           << ", segment_id=" << segment_id
+                           << ", client_mutation_id=" << client_mutation_id
+                           << ", error=" << toString(record_err);
+                return tl::make_unexpected(record_err);
+            }
+            return {};
+        }
         return tl::make_unexpected(ErrorCode::OBJECT_NOT_FOUND);
     }
 
@@ -617,9 +703,11 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerRemoveReplica(
             payload.object_key = std::string(key);
             payload.client_id = client_id;
             payload.segment_id = segment_id;
+            payload.client_mutation_id = client_mutation_id;
             ErrorCode record_err =
                 RecordOplog(OpType_REMOVE_REPLICA, payload.object_key,
-                            SerializeP2PPayload(payload));
+                            SerializeP2PPayload(payload),
+                            /*force_sync=*/require_oplog_success);
             if (record_err != ErrorCode::OK) {
                 LOG(ERROR) << "RemoveReplica(P2P): failed to record oplog"
                            << ", client_id=" << client_id
@@ -641,6 +729,26 @@ tl::expected<void, ErrorCode> P2PMasterService::InnerRemoveReplica(
     LOG(WARNING) << "replica not found"
                  << ", key: " << key << ", client_id: " << client_id
                  << ", segment_id: " << segment_id;
+    if (require_oplog_success && client_mutation_id != 0) {
+        RemoveReplicaPayload payload;
+        payload.object_key = std::string(key);
+        payload.client_id = client_id;
+        payload.segment_id = segment_id;
+        payload.client_mutation_id = client_mutation_id;
+        ErrorCode record_err =
+            RecordOplog(OpType_REMOVE_REPLICA, payload.object_key,
+                        SerializeP2PPayload(payload), /*force_sync=*/true);
+        if (record_err != ErrorCode::OK) {
+            LOG(ERROR) << "RemoveReplica(P2P): failed to record missing "
+                          "replica oplog"
+                       << ", client_id=" << client_id
+                       << ", segment_id=" << segment_id
+                       << ", client_mutation_id=" << client_mutation_id
+                       << ", error=" << toString(record_err);
+            return tl::make_unexpected(record_err);
+        }
+        return {};
+    }
     return tl::make_unexpected(ErrorCode::REPLICA_NOT_FOUND);
 }
 
@@ -762,6 +870,91 @@ auto P2PMasterService::BatchSyncReplica(const BatchSyncReplicaRequest& req)
         }
     }
 
+    return response;
+}
+
+auto P2PMasterService::ReplayClientMutations(
+    const ReplayClientMutationsRequest& req)
+    -> tl::expected<ReplayClientMutationsResponse, ErrorCode> {
+    std::lock_guard<std::mutex> replay_lock(client_replay_apply_mutex_);
+
+    auto client = std::static_pointer_cast<P2PClientMeta>(
+        client_manager_->GetClient(req.client_id));
+    if (!client) {
+        LOG(ERROR) << "ReplayClientMutations: client not found"
+                   << ", client_id=" << req.client_id;
+        return tl::make_unexpected(ErrorCode::CLIENT_NOT_FOUND);
+    }
+
+    ReplayClientMutationsResponse response;
+    response.results.resize(req.mutations.size(), ErrorCode::OK);
+
+    const uint64_t initial_cursor = GetClientLastMutationId(req.client_id);
+    uint64_t cursor = initial_cursor;
+
+    for (size_t i = 0; i < req.mutations.size(); ++i) {
+        const auto& mutation = req.mutations[i];
+        if (mutation.mutation_id == 0) {
+            LOG(ERROR) << "ReplayClientMutations: invalid mutation id 0"
+                       << ", client_id=" << req.client_id << ", index=" << i;
+            response.results[i] = ErrorCode::INVALID_PARAMS;
+            std::fill(response.results.begin() + i + 1, response.results.end(),
+                      ErrorCode::INTERNAL_ERROR);
+            break;
+        }
+
+        if (mutation.mutation_id <= cursor) {
+            if (mutation.mutation_id <= initial_cursor) {
+                continue;
+            }
+            LOG(ERROR) << "ReplayClientMutations: non-monotonic mutation id"
+                       << ", client_id=" << req.client_id << ", index=" << i
+                       << ", mutation_id=" << mutation.mutation_id
+                       << ", cursor=" << cursor;
+            response.results[i] = ErrorCode::INVALID_PARAMS;
+            std::fill(response.results.begin() + i + 1, response.results.end(),
+                      ErrorCode::INTERNAL_ERROR);
+            break;
+        }
+
+        MetadataAccessorRW accessor(this, mutation.key);
+        tl::expected<void, ErrorCode> result;
+        if (mutation.type == P2P_CLIENT_MUTATION_ADD_REPLICA) {
+            result = InnerAddReplica(
+                accessor.GetShard().GetRef(), mutation.key, req.client_id,
+                mutation.segment_id, mutation.size, client,
+                mutation.mutation_id, /*require_oplog_success=*/true);
+        } else if (mutation.type == P2P_CLIENT_MUTATION_REMOVE_REPLICA) {
+            result = InnerRemoveReplica(
+                accessor.GetShard().GetRef(), mutation.key, req.client_id,
+                mutation.segment_id, mutation.mutation_id,
+                /*require_oplog_success=*/true);
+        } else {
+            LOG(ERROR) << "ReplayClientMutations: invalid mutation type"
+                       << ", client_id=" << req.client_id << ", index=" << i
+                       << ", type=" << static_cast<int>(mutation.type);
+            response.results[i] = ErrorCode::INVALID_PARAMS;
+            std::fill(response.results.begin() + i + 1, response.results.end(),
+                      ErrorCode::INTERNAL_ERROR);
+            break;
+        }
+
+        if (!result.has_value()) {
+            response.results[i] = result.error();
+            std::fill(response.results.begin() + i + 1, response.results.end(),
+                      ErrorCode::INTERNAL_ERROR);
+            LOG(ERROR) << "ReplayClientMutations: failed to apply mutation"
+                       << ", client_id=" << req.client_id << ", index=" << i
+                       << ", mutation_id=" << mutation.mutation_id
+                       << ", error=" << toString(result.error());
+            break;
+        }
+
+        cursor = mutation.mutation_id;
+        SetClientLastMutationId(req.client_id, cursor);
+    }
+
+    response.last_mutation_id = cursor;
     return response;
 }
 

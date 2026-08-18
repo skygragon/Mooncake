@@ -36,6 +36,11 @@ struct RpcNameTraits<&WrappedP2PMasterService::BatchSyncReplica> {
 };
 
 template <>
+struct RpcNameTraits<&WrappedP2PMasterService::ReplayClientMutations> {
+    static constexpr const char* value = "ReplayClientMutations";
+};
+
+template <>
 struct RpcNameTraits<&WrappedP2PMasterService::SetSyncCompleted> {
     static constexpr const char* value = "SetSyncCompleted";
 };
@@ -112,6 +117,19 @@ P2PMasterClient::BatchSyncReplica(const BatchSyncReplicaRequest& req) {
 
     auto result = invoke_rpc<&WrappedP2PMasterService::BatchSyncReplica,
                              BatchSyncReplicaResponse>(req);
+    timer.LogResponseExpected(result);
+    return result;
+}
+
+tl::expected<ReplayClientMutationsResponse, ErrorCode>
+P2PMasterClient::ReplayClientMutations(
+    const ReplayClientMutationsRequest& req) {
+    ScopedVLogTimer timer(1, "P2PMasterClient::ReplayClientMutations");
+    timer.LogRequest("mutation_count=", req.mutations.size());
+
+    auto result =
+        invoke_rpc<&WrappedP2PMasterService::ReplayClientMutations,
+                   ReplayClientMutationsResponse>(req);
     timer.LogResponseExpected(result);
     return result;
 }

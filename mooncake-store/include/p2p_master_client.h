@@ -54,6 +54,12 @@ class P2PMasterClient final : public MasterClient {
     BatchSyncReplica(const BatchSyncReplicaRequest& req);
 
     /**
+     * @brief Replay ordered client mutations after Redis HA failover
+     */
+    [[nodiscard]] tl::expected<ReplayClientMutationsResponse, ErrorCode>
+    ReplayClientMutations(const ReplayClientMutationsRequest& req);
+
+    /**
      * @brief Notify Master that this client has finished syncing metadata
      */
     [[nodiscard]] tl::expected<void, ErrorCode> SetSyncCompleted(

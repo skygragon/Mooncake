@@ -12,6 +12,7 @@
 #include <exception>
 #include <future>
 #include <thread>
+#include <utility>
 
 #include <async_simple/Try.h>
 #include <async_simple/coro/Lazy.h>
@@ -27,6 +28,10 @@ namespace {
 // (e.g. after TE write failure, or read cleanup). LEASE_EXPIRED is treated as
 // success; a missing owner record is already OK (idempotent).
 constexpr int kRevokeRetryMaxCnt = 3;
+constexpr uint64_t kClientMutationCounterBits = 20;
+constexpr uint64_t kClientMutationCounterMask =
+    (1ULL << kClientMutationCounterBits) - 1;
+constexpr size_t kClientReplayBatchSize = 256;
 
 }  // namespace
 
@@ -153,6 +158,7 @@ ErrorCode P2PClientService::Init(const P2PClientConfig& config) {
     // Saved so a later re-registration (after UnregisterClient) can restart
     // the heartbeat with the same master entry.
     master_server_entry_ = config.master_server_entry;
+    redis_ha_mode_ = master_server_entry_.rfind("redis://", 0) == 0;
     SetMasterDiscoveryConfig(config);
 
     local_ip_ = config.local_ip;
@@ -190,9 +196,16 @@ ErrorCode P2PClientService::Init(const P2PClientConfig& config) {
     //    DEGRADED: connection or registration failed.
     HAClientState initial_state =
         client_registered ? HAClientState::FULL : HAClientState::DEGRADED;
+    HARecoveryManager::RecoveryCallback recovery_callback;
+    if (redis_ha_mode_) {
+        recovery_callback =
+            [this](const HARecoveryManager::AbortCheck& abort_fn) {
+                return ReplayClientMutationsForRedisHA(abort_fn);
+            };
+    }
     ha_manager_ = std::make_unique<HARecoveryManager>(
         client_id_, master_client_, data_manager_, async_route_notifier_,
-        view_version_, initial_state);
+        view_version_, initial_state, std::move(recovery_callback));
 
     // 4. Start heartbeat immediately after registration so master does not
     //    consider this client disconnected during a lengthy initialization.
@@ -389,6 +402,9 @@ ErrorCode P2PClientService::InitStorage(const P2PClientConfig& config) {
 AddReplicaCallback P2PClientService::BuildAddReplicaCallback() {
     return [this](std::string_view key, const UUID& tier_id,
                   size_t size) -> tl::expected<void, ErrorCode> {
+        if (redis_ha_mode_) {
+            return RecordAndSyncAddReplica(key, tier_id, size);
+        }
         // In degraded mode, skip metadata notification to Master.
         // The data is stored locally; the recovery pipeline will re-sync
         // all local metadata to Master when the connection is restored.
@@ -405,6 +421,9 @@ AddReplicaCallback P2PClientService::BuildAddReplicaCallback() {
 RemoveReplicaCallback P2PClientService::BuildRemoveReplicaCallback() {
     return [this](std::string_view key,
                   const UUID& tier_id) -> tl::expected<void, ErrorCode> {
+        if (redis_ha_mode_) {
+            return RecordAndSyncRemoveReplica(key, tier_id);
+        }
         // In degraded mode, skip metadata notification to Master.
         // The recovery pipeline will re-sync all local metadata,
         // and Master will discard routes for keys that no longer
@@ -466,6 +485,224 @@ P2PClientService::SyncBatchRemoveReplica(std::string_view key,
         }
     }
     return results;
+}
+
+uint64_t P2PClientService::NextClientMutationIdLocked() {
+    using namespace std::chrono;
+    uint64_t now_ms = duration_cast<milliseconds>(
+                          steady_clock::now().time_since_epoch())
+                          .count();
+    if (now_ms < last_mutation_timestamp_ms_) {
+        now_ms = last_mutation_timestamp_ms_;
+    }
+
+    if (now_ms == last_mutation_timestamp_ms_) {
+        if (mutation_counter_in_ms_ >= kClientMutationCounterMask) {
+            do {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                now_ms = duration_cast<milliseconds>(
+                             steady_clock::now().time_since_epoch())
+                             .count();
+            } while (now_ms <= last_mutation_timestamp_ms_);
+            last_mutation_timestamp_ms_ = now_ms;
+            mutation_counter_in_ms_ = 0;
+        } else {
+            ++mutation_counter_in_ms_;
+        }
+    } else {
+        last_mutation_timestamp_ms_ = now_ms;
+        mutation_counter_in_ms_ = 0;
+    }
+
+    return (last_mutation_timestamp_ms_ << kClientMutationCounterBits) |
+           mutation_counter_in_ms_;
+}
+
+P2PClientMutation P2PClientService::AppendClientMutationLocked(
+    uint8_t type, std::string_view key, const UUID& tier_id, size_t size) {
+    P2PClientMutation mutation;
+    mutation.mutation_id = NextClientMutationIdLocked();
+    mutation.type = type;
+    mutation.key = std::string(key);
+    mutation.segment_id = tier_id;
+    mutation.size = size;
+    client_mutation_journal_.push_back(mutation);
+    return mutation;
+}
+
+void P2PClientService::TrimClientMutationJournalLocked(
+    uint64_t last_mutation_id) {
+    local_replay_cursor_ = std::max(local_replay_cursor_, last_mutation_id);
+    while (!client_mutation_journal_.empty() &&
+           client_mutation_journal_.front().mutation_id <=
+               local_replay_cursor_) {
+        client_mutation_journal_.pop_front();
+    }
+}
+
+std::vector<P2PClientMutation> P2PClientService::CollectReplayBatchLocked(
+    uint64_t last_mutation_id, size_t max_count) const {
+    std::vector<P2PClientMutation> batch;
+    batch.reserve(std::min(max_count, client_mutation_journal_.size()));
+    for (const auto& mutation : client_mutation_journal_) {
+        if (mutation.mutation_id <= last_mutation_id) {
+            continue;
+        }
+        batch.push_back(mutation);
+        if (batch.size() >= max_count) {
+            break;
+        }
+    }
+    return batch;
+}
+
+tl::expected<void, ErrorCode> P2PClientService::RecordAndSyncAddReplica(
+    std::string_view key, const UUID& tier_id, size_t size) {
+    std::lock_guard<std::mutex> lock(client_mutation_mutex_);
+    auto mutation = AppendClientMutationLocked(P2P_CLIENT_MUTATION_ADD_REPLICA,
+                                               key, tier_id, size);
+    if (ha_manager_ && ha_manager_->IsLocalService()) {
+        return {};
+    }
+
+    AddReplicaRequest req;
+    req.key = mutation.key;
+    req.size = mutation.size;
+    req.client_id = client_id_;
+    req.segment_id = mutation.segment_id;
+    req.client_mutation_id = mutation.mutation_id;
+    auto result = master_client_.AddReplica(req);
+    if (!result) {
+        LOG(ERROR) << "Failed to add replica for key: " << key
+                   << " mutation_id=" << mutation.mutation_id
+                   << " error: " << result.error();
+        return tl::unexpected(result.error());
+    }
+    TrimClientMutationJournalLocked(mutation.mutation_id);
+    return {};
+}
+
+tl::expected<void, ErrorCode> P2PClientService::RecordAndSyncRemoveReplica(
+    std::string_view key, const UUID& tier_id) {
+    std::lock_guard<std::mutex> lock(client_mutation_mutex_);
+    auto mutation = AppendClientMutationLocked(
+        P2P_CLIENT_MUTATION_REMOVE_REPLICA, key, tier_id, 0);
+    if (ha_manager_ && ha_manager_->IsLocalService()) {
+        return {};
+    }
+
+    RemoveReplicaRequest req;
+    req.key = mutation.key;
+    req.client_id = client_id_;
+    req.segment_id = mutation.segment_id;
+    req.client_mutation_id = mutation.mutation_id;
+    auto result = master_client_.RemoveReplica(req);
+    if (!result) {
+        LOG(ERROR) << "Failed to remove replica for key: " << key
+                   << " mutation_id=" << mutation.mutation_id
+                   << " error: " << result.error();
+        return tl::unexpected(result.error());
+    }
+    TrimClientMutationJournalLocked(mutation.mutation_id);
+    return {};
+}
+
+tl::expected<uint64_t, ErrorCode> P2PClientService::RefreshMasterReplayCursor() {
+    RegisterClientRequest req;
+    req.client_id = client_id_;
+    req.segments = CollectTierSegments();
+    req.deployment_mode = DeploymentMode::P2P;
+    req.ip_address = local_ip_;
+    req.rpc_port = client_rpc_port_;
+
+    auto result = master_client_.RegisterClient(req);
+    if (!result.has_value()) {
+        LOG(ERROR) << "RefreshMasterReplayCursor: RegisterClient failed"
+                   << ", client_id=" << client_id_
+                   << ", error=" << toString(result.error());
+        return tl::make_unexpected(result.error());
+    }
+
+    view_version_ = result->view_version;
+    registered_.store(true, std::memory_order_release);
+    return result->last_mutation_id;
+}
+
+tl::expected<void, ErrorCode> P2PClientService::ReplayClientMutationsForRedisHA(
+    const HARecoveryManager::AbortCheck& abort_fn) {
+    std::unique_lock<std::mutex> lock(client_mutation_mutex_);
+
+    uint64_t cursor = 0;
+    while (true) {
+        if (abort_fn && abort_fn()) {
+            return tl::make_unexpected(ErrorCode::SHUTTING_DOWN);
+        }
+        auto cursor_result = RefreshMasterReplayCursor();
+        if (cursor_result.has_value()) {
+            cursor = cursor_result.value();
+            TrimClientMutationJournalLocked(cursor);
+            break;
+        }
+        lock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        lock.lock();
+    }
+
+    while (true) {
+        if (abort_fn && abort_fn()) {
+            return tl::make_unexpected(ErrorCode::SHUTTING_DOWN);
+        }
+
+        auto batch = CollectReplayBatchLocked(cursor, kClientReplayBatchSize);
+        if (batch.empty()) {
+            LOG(INFO) << "Redis HA client replay completed"
+                      << ", client_id=" << client_id_
+                      << ", cursor=" << cursor;
+            return {};
+        }
+
+        ReplayClientMutationsRequest req;
+        req.client_id = client_id_;
+        req.mutations = std::move(batch);
+        auto result = master_client_.ReplayClientMutations(req);
+        if (!result.has_value()) {
+            LOG(ERROR) << "ReplayClientMutations RPC failed"
+                       << ", client_id=" << client_id_
+                       << ", error=" << toString(result.error());
+            lock.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            lock.lock();
+            continue;
+        }
+
+        auto new_cursor = result->last_mutation_id;
+        if (new_cursor < cursor) {
+            LOG(ERROR) << "ReplayClientMutations returned stale cursor"
+                       << ", client_id=" << client_id_
+                       << ", old_cursor=" << cursor
+                       << ", new_cursor=" << new_cursor;
+            return tl::make_unexpected(ErrorCode::INTERNAL_ERROR);
+        }
+        TrimClientMutationJournalLocked(new_cursor);
+
+        bool has_error = false;
+        ErrorCode first_error = ErrorCode::OK;
+        for (auto ec : result->results) {
+            if (ec != ErrorCode::OK) {
+                has_error = true;
+                first_error = ec;
+                break;
+            }
+        }
+        if (has_error && new_cursor == cursor) {
+            LOG(ERROR) << "ReplayClientMutations failed without progress"
+                       << ", client_id=" << client_id_
+                       << ", cursor=" << cursor
+                       << ", error=" << toString(first_error);
+            return tl::make_unexpected(first_error);
+        }
+        cursor = new_cursor;
+    }
 }
 
 SegmentSyncCallback P2PClientService::BuildSegmentSyncCallback() {
@@ -577,6 +814,11 @@ P2PClientService::InnerRegisterClient() {
     } else {
         view_version_ = register_result.value().view_version;
         registered_.store(true, std::memory_order_release);
+        if (redis_ha_mode_) {
+            std::lock_guard<std::mutex> lock(client_mutation_mutex_);
+            TrimClientMutationJournalLocked(
+                register_result.value().last_mutation_id);
+        }
 
         // A successful register means the master did not have us — drive HA
         // recovery to re-sync metadata. The register entry points refuse to run

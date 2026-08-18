@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <unordered_set>
+#include <utility>
 
 namespace mooncake {
 
@@ -11,12 +12,14 @@ HARecoveryManager::HARecoveryManager(
     const UUID& client_id, P2PMasterClient& master_client,
     std::optional<DataManager>& data_manager,
     std::unique_ptr<AsyncMetadataNotifier>& notifier,
-    std::atomic<ViewVersionId>& view_version, HAClientState initial_state)
+    std::atomic<ViewVersionId>& view_version, HAClientState initial_state,
+    RecoveryCallback recovery_callback)
     : client_id_(client_id),
       master_client_(master_client),
       data_manager_(data_manager),
       notifier_(notifier),
       view_version_(view_version),
+      recovery_callback_(std::move(recovery_callback)),
       state_(initial_state) {
     LOG(INFO) << "HA recovery manager initialized with state: "
               << initial_state;
@@ -171,6 +174,21 @@ void HARecoveryManager::RecoveryPipelineMain(AbortToken need_abort) {
         return need_abort->load(std::memory_order_acquire);
     };
 
+    if (recovery_callback_) {
+        auto result = recovery_callback_(aborted);
+        if (!result.has_value()) {
+            if (!aborted()) {
+                LOG(ERROR) << "Recovery callback failed"
+                           << ", error=" << toString(result.error());
+                TransitionState(HAClientState::DEGRADED,
+                                "custom recovery failed");
+            }
+            return;
+        }
+        FinishRecovery(need_abort);
+        return;
+    }
+
     // Phase 1: Hot key sync — enqueue hot keys first for fastest recovery.
     // Request ALL tracked hot keys (0 == all), not the scheduler's default
     // top-64: recovery must prioritize the entire hot working set, and the
@@ -280,10 +298,18 @@ void HARecoveryManager::RecoveryPipelineMain(AbortToken need_abort) {
         }
     }
 
-    // All recovery routes delivered. Notify Master.
-    // Retry indefinitely until success or abort — if Master restarts again,
-    // HandleEvent(MASTER_UNREACHABLE) will set need_abort and this thread
-    // exits.
+    FinishRecovery(need_abort);
+    LOG(INFO) << "Recovery pipeline completed";
+}
+
+void HARecoveryManager::FinishRecovery(AbortToken need_abort) {
+    auto aborted = [&]() {
+        return need_abort->load(std::memory_order_acquire);
+    };
+
+    // All recovery routes delivered. Notify Master. Retry indefinitely until
+    // success or abort — if Master restarts again, HandleEvent will set
+    // need_abort and this thread exits.
     while (true) {
         if (aborted()) return;
         auto sync_result = SetSyncCompleted();
@@ -304,7 +330,6 @@ void HARecoveryManager::RecoveryPipelineMain(AbortToken need_abort) {
                          << ", reason=recovery complete";
         }
     }
-    LOG(INFO) << "Recovery pipeline completed";
 }
 
 // return false when abort

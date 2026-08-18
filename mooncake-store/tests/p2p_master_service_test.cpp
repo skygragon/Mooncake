@@ -253,6 +253,64 @@ TEST_F(P2PMasterServiceTest, RestoreMetadataPreservesRegisterClientCursor) {
     EXPECT_EQ(result->last_mutation_id, 456u);
 }
 
+TEST_F(P2PMasterServiceTest, ReplayClientMutationsAdvancesCursor) {
+    auto service = CreateService();
+    auto seg = MakeP2PSegment();
+    auto client_id = generate_uuid();
+    RegisterP2PClient(*service, client_id, {seg}, "127.0.0.1", 50051);
+
+    ReplayClientMutationsRequest req;
+    req.client_id = client_id;
+    P2PClientMutation add;
+    add.mutation_id = 10;
+    add.type = P2P_CLIENT_MUTATION_ADD_REPLICA;
+    add.key = "replay-key";
+    add.segment_id = seg.id;
+    add.size = 4096;
+    req.mutations.push_back(add);
+
+    auto result = service->ReplayClientMutations(req);
+    ASSERT_TRUE(result.has_value());
+    ASSERT_EQ(result->results.size(), 1u);
+    EXPECT_EQ(result->results[0], ErrorCode::OK);
+    EXPECT_EQ(result->last_mutation_id, 10u);
+    EXPECT_EQ(service->GetClientLastMutationId(client_id), 10u);
+
+    auto shard_idx = service->GetShardIndex(add.key);
+    auto& metadata = service->metadata_shards_[shard_idx].metadata;
+    auto it = metadata.find(add.key);
+    ASSERT_NE(it, metadata.end());
+    EXPECT_EQ(it->second->replicas_.size(), 1u);
+
+    auto duplicate = service->ReplayClientMutations(req);
+    ASSERT_TRUE(duplicate.has_value());
+    EXPECT_EQ(duplicate->last_mutation_id, 10u);
+    EXPECT_EQ(it->second->replicas_.size(), 1u);
+}
+
+TEST_F(P2PMasterServiceTest, ReplayClientMutationsRemovesMissingAsIdempotent) {
+    auto service = CreateService();
+    auto seg = MakeP2PSegment();
+    auto client_id = generate_uuid();
+    RegisterP2PClient(*service, client_id, {seg}, "127.0.0.1", 50051);
+
+    ReplayClientMutationsRequest req;
+    req.client_id = client_id;
+    P2PClientMutation remove;
+    remove.mutation_id = 11;
+    remove.type = P2P_CLIENT_MUTATION_REMOVE_REPLICA;
+    remove.key = "missing-key";
+    remove.segment_id = seg.id;
+    req.mutations.push_back(remove);
+
+    auto result = service->ReplayClientMutations(req);
+    ASSERT_TRUE(result.has_value());
+    ASSERT_EQ(result->results.size(), 1u);
+    EXPECT_EQ(result->results[0], ErrorCode::OK);
+    EXPECT_EQ(result->last_mutation_id, 11u);
+    EXPECT_EQ(service->GetClientLastMutationId(client_id), 11u);
+}
+
 // ============================================================
 // GetWriteRoute Tests
 // ============================================================

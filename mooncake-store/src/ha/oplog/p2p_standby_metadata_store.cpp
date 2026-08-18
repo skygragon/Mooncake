@@ -191,6 +191,17 @@ void P2PStandbyMetadataStore::RegisterClient(
     // promotion, so a one-time scan during ExportMetadata() is acceptable.
 }
 
+void P2PStandbyMetadataStore::AdvanceClientMutationCursor(
+    const UUID& client_id, uint64_t last_mutation_id) {
+    if (last_mutation_id == 0) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto& info = clients_[client_id];
+    info.client_id = client_id;
+    info.last_mutation_id = std::max(info.last_mutation_id, last_mutation_id);
+}
+
 void P2PStandbyMetadataStore::UnRegisterClient(const UUID& client_id) {
     std::lock_guard<std::mutex> lock(mutex_);
     clients_.erase(client_id);

@@ -69,6 +69,12 @@ class P2PMasterService : public MasterService {
         -> BatchSyncReplicaResponse;
 
     /**
+     * @brief Replay ordered client mutations and advance client replay cursor.
+     */
+    auto ReplayClientMutations(const ReplayClientMutationsRequest& req)
+        -> tl::expected<ReplayClientMutationsResponse, ErrorCode>;
+
+    /**
      * @brief Client notifies Master that metadata sync is complete
      */
     auto SetSyncCompleted(UUID client_id) -> tl::expected<void, ErrorCode>;
@@ -86,7 +92,8 @@ class P2PMasterService : public MasterService {
         uint64_t last_applied_sequence_id = 0);
 
     ErrorCode RecordOplog(OpType type, const std::string& key,
-                          const std::string& payload = std::string());
+                          const std::string& payload = std::string(),
+                          bool force_sync = false);
     uint64_t GetClientLastMutationId(const UUID& client_id) const;
 
     std::vector<Replica::Descriptor> FilterReplicas(
@@ -130,10 +137,13 @@ class P2PMasterService : public MasterService {
     tl::expected<void, ErrorCode> InnerAddReplica(
         MetadataShard& shard, std::string_view key, const UUID& client_id,
         const UUID& segment_id, size_t size,
-        const std::shared_ptr<P2PClientMeta>& client) NO_THREAD_SAFETY_ANALYSIS;
+        const std::shared_ptr<P2PClientMeta>& client,
+        uint64_t client_mutation_id = 0,
+        bool require_oplog_success = false) NO_THREAD_SAFETY_ANALYSIS;
     tl::expected<void, ErrorCode> InnerRemoveReplica(
         MetadataShard& shard, std::string_view key, const UUID& client_id,
-        const UUID& segment_id) NO_THREAD_SAFETY_ANALYSIS;
+        const UUID& segment_id, uint64_t client_mutation_id = 0,
+        bool require_oplog_success = true) NO_THREAD_SAFETY_ANALYSIS;
     void EnsureClientReplayCursor(const UUID& client_id);
     void SetClientLastMutationId(const UUID& client_id,
                                  uint64_t last_mutation_id);
@@ -148,6 +158,7 @@ class P2PMasterService : public MasterService {
     bool enable_async_oplog_write_{false};
 
     mutable std::mutex client_replay_cursor_mutex_;
+    std::mutex client_replay_apply_mutex_;
     std::unordered_map<UUID, uint64_t, boost::hash<UUID>>
         client_last_mutation_ids_;
 };

@@ -83,6 +83,10 @@ class P2PStandbyMetadataStore : public MetadataStore {
                         uint16_t rpc_port, const std::vector<Segment>& segments,
                         uint64_t last_mutation_id = 0);
 
+    /// Advance a client's Redis HA replay cursor.
+    void AdvanceClientMutationCursor(const UUID& client_id,
+                                     uint64_t last_mutation_id);
+
     /// Unregister a client.
     /// Also removes all replicas owned by this client from their objects
     /// (cascade delete).

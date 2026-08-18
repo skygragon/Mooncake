@@ -69,8 +69,10 @@ struct AddReplicaPayload {
     UUID client_id{0, 0};
     UUID segment_id{0, 0};
     size_t size = 0;
+    uint64_t client_mutation_id = 0;
 
-    YLT_REFL(AddReplicaPayload, object_key, client_id, segment_id, size);
+    YLT_REFL(AddReplicaPayload, object_key, client_id, segment_id, size,
+             client_mutation_id);
 };
 
 /// Payload for REMOVE_REPLICA (OpType=11, sync).
@@ -79,8 +81,10 @@ struct RemoveReplicaPayload {
     std::string object_key;
     UUID client_id{0, 0};
     UUID segment_id{0, 0};
+    uint64_t client_mutation_id = 0;
 
-    YLT_REFL(RemoveReplicaPayload, object_key, client_id, segment_id);
+    YLT_REFL(RemoveReplicaPayload, object_key, client_id, segment_id,
+             client_mutation_id);
 };
 
 /// Payload for MOUNT_SEGMENT (OpType=12, sync).

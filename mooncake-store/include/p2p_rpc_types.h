@@ -141,8 +141,10 @@ struct AddReplicaRequest {
     size_t size;
     UUID client_id;
     UUID segment_id;
+    uint64_t client_mutation_id = 0;
 };
-YLT_REFL(AddReplicaRequest, key, size, client_id, segment_id);
+YLT_REFL(AddReplicaRequest, key, size, client_id, segment_id,
+         client_mutation_id);
 
 /**
  * @brief Request to remove a replica
@@ -151,8 +153,10 @@ struct RemoveReplicaRequest {
     std::string_view key;
     UUID client_id;
     UUID segment_id;
+    uint64_t client_mutation_id = 0;
 };
-YLT_REFL(RemoveReplicaRequest, key, client_id, segment_id);
+YLT_REFL(RemoveReplicaRequest, key, client_id, segment_id,
+         client_mutation_id);
 
 /**
  * @brief Request to remove replicas from multiple segments in one call
@@ -189,5 +193,38 @@ struct BatchSyncReplicaResponse {
     std::vector<ErrorCode> remove_results;
 };
 YLT_REFL(BatchSyncReplicaResponse, add_results, remove_results);
+
+constexpr uint8_t P2P_CLIENT_MUTATION_ADD_REPLICA = 1;
+constexpr uint8_t P2P_CLIENT_MUTATION_REMOVE_REPLICA = 2;
+
+/**
+ * @brief Ordered client metadata mutation for Redis HA replay.
+ */
+struct P2PClientMutation {
+    uint64_t mutation_id = 0;
+    uint8_t type = 0;
+    std::string key;
+    UUID segment_id{0, 0};
+    size_t size = 0;
+};
+YLT_REFL(P2PClientMutation, mutation_id, type, key, segment_id, size);
+
+/**
+ * @brief Replay client mutations after Redis HA master failover.
+ */
+struct ReplayClientMutationsRequest {
+    UUID client_id;
+    std::vector<P2PClientMutation> mutations;
+};
+YLT_REFL(ReplayClientMutationsRequest, client_id, mutations);
+
+/**
+ * @brief Response for ordered client mutation replay.
+ */
+struct ReplayClientMutationsResponse {
+    std::vector<ErrorCode> results;
+    uint64_t last_mutation_id = 0;
+};
+YLT_REFL(ReplayClientMutationsResponse, results, last_mutation_id);
 
 }  // namespace mooncake

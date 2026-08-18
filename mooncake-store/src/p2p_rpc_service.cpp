@@ -33,6 +33,10 @@ void RegisterP2PRpcService(
         .register_handler<&mooncake::WrappedP2PMasterService::BatchSyncReplica>(
             &wrapped_master_service);
     server
+        .register_handler<
+            &mooncake::WrappedP2PMasterService::ReplayClientMutations>(
+            &wrapped_master_service);
+    server
         .register_handler<&mooncake::WrappedP2PMasterService::SetSyncCompleted>(
             &wrapped_master_service);
 }
@@ -166,6 +170,21 @@ BatchSyncReplicaResponse WrappedP2PMasterService::BatchSyncReplica(
     timer.LogResponse("add_failures=", add_failures,
                       ", remove_failures=", remove_failures);
     return response;
+}
+
+tl::expected<ReplayClientMutationsResponse, ErrorCode>
+WrappedP2PMasterService::ReplayClientMutations(
+    const ReplayClientMutationsRequest& req) {
+    ScopedVLogTimer timer(1, "ReplayClientMutations");
+    timer.LogRequest("client_id=", req.client_id,
+                     ", mutation_count=", req.mutations.size());
+
+    auto result = master_service_.ReplayClientMutations(req);
+    if (!result) {
+        LOG(ERROR) << "ReplayClientMutations failed: "
+                   << toString(result.error());
+    }
+    return result;
 }
 
 tl::expected<void, ErrorCode> WrappedP2PMasterService::SetSyncCompleted(

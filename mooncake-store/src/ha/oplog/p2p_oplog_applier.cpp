@@ -61,6 +61,8 @@ bool P2POpLogApplier::ApplyAddReplica(const OpLogEntry& entry) {
 
     p2p_store_->AddReplica(payload.object_key, payload.client_id,
                            payload.segment_id, payload.size, entry.sequence_id);
+    p2p_store_->AdvanceClientMutationCursor(payload.client_id,
+                                            payload.client_mutation_id);
     return true;
 }
 
@@ -76,6 +78,8 @@ bool P2POpLogApplier::ApplyRemoveReplica(const OpLogEntry& entry) {
 
     p2p_store_->RemoveReplica(payload.object_key, payload.client_id,
                               payload.segment_id);
+    p2p_store_->AdvanceClientMutationCursor(payload.client_id,
+                                            payload.client_mutation_id);
     return true;
 }
 

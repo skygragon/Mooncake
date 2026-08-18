@@ -1,6 +1,7 @@
 #pragma once
 
 #include <csignal>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
@@ -252,6 +253,22 @@ class P2PClientService final : public ClientService {
      */
     std::vector<tl::expected<void, ErrorCode>> SyncBatchRemoveReplica(
         std::string_view key, std::vector<UUID> segment_ids);
+
+    tl::expected<void, ErrorCode> RecordAndSyncAddReplica(
+        std::string_view key, const UUID& tier_id, size_t size);
+    tl::expected<void, ErrorCode> RecordAndSyncRemoveReplica(
+        std::string_view key, const UUID& tier_id);
+    uint64_t NextClientMutationIdLocked();
+    P2PClientMutation AppendClientMutationLocked(uint8_t type,
+                                                 std::string_view key,
+                                                 const UUID& tier_id,
+                                                 size_t size);
+    void TrimClientMutationJournalLocked(uint64_t last_mutation_id);
+    std::vector<P2PClientMutation> CollectReplayBatchLocked(
+        uint64_t last_mutation_id, size_t max_count) const;
+    tl::expected<uint64_t, ErrorCode> RefreshMasterReplayCursor();
+    tl::expected<void, ErrorCode> ReplayClientMutationsForRedisHA(
+        const HARecoveryManager::AbortCheck& abort_fn);
 
     /**
      * @brief Collect tier info from DataManager and build P2P Segments.
@@ -556,6 +573,13 @@ class P2PClientService final : public ClientService {
 
     // HA recovery manager
     std::unique_ptr<HARecoveryManager> ha_manager_;
+
+    bool redis_ha_mode_{false};
+    mutable std::mutex client_mutation_mutex_;
+    std::deque<P2PClientMutation> client_mutation_journal_;
+    uint64_t last_mutation_timestamp_ms_ = 0;
+    uint64_t mutation_counter_in_ms_ = 0;
+    uint64_t local_replay_cursor_ = 0;
 
     // Cross-node transfer direction from P2PClientConfig at Init().
     TransferDirectionMode transfer_direction_mode_ =

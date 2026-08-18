@@ -302,6 +302,47 @@ TEST(P2POpLogApplierTest, ApplyRegisterClient) {
     EXPECT_EQ(info->segments[0].id, seg_id);
 }
 
+TEST(P2POpLogApplierTest, ApplyReplicaMutationsAdvanceClientCursor) {
+    P2PStandbyMetadataStore store;
+    P2POpLogApplier applier(&store, "test-cluster");
+
+    auto client = MakeUUID(1, 0);
+    auto seg_id = MakeUUID(100, 0);
+    RegisterClientPayload register_payload;
+    register_payload.client_id = client;
+    register_payload.ip_address = "192.168.1.100";
+    register_payload.rpc_port = 50051;
+    register_payload.last_mutation_id = 5;
+    register_payload.segments = {MakeSegment(seg_id, 2048)};
+    ASSERT_TRUE(
+        applier.ApplyOpLogEntry(MakeRegisterClientEntry(1, register_payload)));
+
+    AddReplicaPayload add_payload;
+    add_payload.object_key = "cursor-key";
+    add_payload.client_id = client;
+    add_payload.segment_id = seg_id;
+    add_payload.size = 1024;
+    add_payload.client_mutation_id = 10;
+    ASSERT_TRUE(applier.ApplyOpLogEntry(
+        MakeAddReplicaEntry(2, "cursor-key", add_payload)));
+
+    auto info = store.GetClient(client);
+    ASSERT_NE(info, nullptr);
+    EXPECT_EQ(info->last_mutation_id, 10u);
+
+    RemoveReplicaPayload remove_payload;
+    remove_payload.object_key = "cursor-key";
+    remove_payload.client_id = client;
+    remove_payload.segment_id = seg_id;
+    remove_payload.client_mutation_id = 11;
+    ASSERT_TRUE(applier.ApplyOpLogEntry(
+        MakeRemoveReplicaEntry(3, "cursor-key", remove_payload)));
+
+    info = store.GetClient(client);
+    ASSERT_NE(info, nullptr);
+    EXPECT_EQ(info->last_mutation_id, 11u);
+}
+
 TEST(P2POpLogApplierTest, ApplyUnregisterClient) {
     P2PStandbyMetadataStore store;
     P2POpLogApplier applier(&store, "test-cluster");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -37,11 +38,16 @@ namespace mooncake {
  */
 class HARecoveryManager {
    public:
+    using AbortCheck = std::function<bool()>;
+    using RecoveryCallback =
+        std::function<tl::expected<void, ErrorCode>(const AbortCheck&)>;
+
     HARecoveryManager(const UUID& client_id, P2PMasterClient& master_client,
                       std::optional<DataManager>& data_manager,
                       std::unique_ptr<AsyncMetadataNotifier>& notifier,
                       std::atomic<ViewVersionId>& view_version,
-                      HAClientState initial_state = HAClientState::FULL);
+                      HAClientState initial_state = HAClientState::FULL,
+                      RecoveryCallback recovery_callback = nullptr);
     ~HARecoveryManager();
 
     HARecoveryManager(const HARecoveryManager&) = delete;
@@ -90,6 +96,7 @@ class HARecoveryManager {
     void TransitionState(HAClientState to, const std::string& reason);
     void StartRecoveryThread();
     void RecoveryPipelineMain(AbortToken need_abort);
+    void FinishRecovery(AbortToken need_abort);
 
     /**
      * @brief Retry enqueue until success or abort is signalled.
@@ -114,6 +121,7 @@ class HARecoveryManager {
     std::optional<DataManager>& data_manager_;
     std::unique_ptr<AsyncMetadataNotifier>& notifier_;
     std::atomic<ViewVersionId>& view_version_;
+    RecoveryCallback recovery_callback_;
 
     std::atomic<HAClientState> state_;
     std::atomic<bool> ready_for_recovery_{
