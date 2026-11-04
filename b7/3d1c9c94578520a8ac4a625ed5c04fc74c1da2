@@ -1,0 +1,36 @@
+mooncake-store/include/p2p/ha/ha_metric_manager.h
+  h_db17cb71b92841 67-68,73-74,85-88,135-136,256,261,268-269,283
+mooncake-store/include/p2p/ha/oplog/redis_oplog_store.h
+  h_db17cb71b92841 158
+mooncake-store/src/p2p/ha/ha_metric_manager.cpp
+  h_db17cb71b92841 57-59,70-72,90-95,128-130,254,259,266-267,317-326,344-353,396-411,489-494,673,678,685-686,701,771-773,779
+mooncake-store/src/p2p/ha/oplog/redis_oplog_store.cpp
+  h_db17cb71b92841 31-36,473-476,522-525
+mooncake-store/src/p2p/ha/oplog/redis_oplog_trim_worker.cpp
+  h_db17cb71b92841 14,50-58,78,312-318
+mooncake-store/src/p2p/ha/redis_election_helper.cpp
+  h_db17cb71b92841 51-56,717,722-724
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 21-32,70,118
+mooncake-store/tests/p2p/ha/oplog/ha_metric_manager_test.cpp
+  h_db17cb71b92841 52-63,90,94,98-99,139-143,165-173,183-186,193,226-229,234,269-270,277-279
+mooncake-store/tests/p2p/ha/oplog/redis_oplog_store_test.cpp
+  h_db17cb71b92841 293-295,299-303
+mooncake-store/tests/p2p/ha/oplog/redis_oplog_trim_worker_test.cpp
+  h_db17cb71b92841 59-66
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 35,861-898
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 15,471-472,493-495,885-886,924-925
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b73d1c9c94578520a8ac4a625ed5c04fc74c1da2",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
