@@ -1,0 +1,20 @@
+docs/source/http-api-reference/http-service.md
+  h_db17cb71b92841 55,69-71
+mooncake-store/src/p2p/ha/oplog/p2p_hot_standby_service.cpp
+  h_db17cb71b92841 348,447-449,994-995,1000-1006
+mooncake-store/src/p2p/ha/oplog/polling_oplog_change_notifier.cpp
+  h_db17cb71b92841 6,61-63,86-91
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 11-12,23,69,93-95,928-1061
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c4903b0c3988f6caa918dc53e39dfc2fc63c8f08",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
