@@ -1,0 +1,34 @@
+docs/source/http-api-reference/http-service.md
+  h_db17cb71b92841 57-58,81-89
+mooncake-store/include/p2p/common/p2p_master_config.h
+  h_db17cb71b92841 54
+mooncake-store/include/p2p/ha/ha_status.h
+  h_db17cb71b92841 78-79,88,114,126-131
+mooncake-store/include/p2p/ha/oplog/p2p_hot_standby_service.h
+  h_db17cb71b92841 55
+mooncake-store/src/p2p/ha/ha_status.cpp
+  h_db17cb71b92841 59,61,67-68,72,81,96-98,150-152,154-170,174-175,229-232,264,305-324,337-340
+mooncake-store/src/p2p/ha/oplog/p2p_hot_standby_service.cpp
+  h_db17cb71b92841 548,551-554
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 91-95,207-208,218-219
+mooncake-store/src/p2p/master/p2p_master_main.cpp
+  h_db17cb71b92841 64-66,167-169,251-252
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 30-31
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 368-399
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 104-111,496-599
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d1f0316956f13941341b7462e850e2902e6bfece",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
