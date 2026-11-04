@@ -1,0 +1,26 @@
+mooncake-store/include/p2p/ha/ha_metric_manager.h
+  h_db17cb71b92841 129-130,154-155,275
+mooncake-store/include/p2p/ha/oplog/p2p_oplog_types.h
+  h_db17cb71b92841 26-28
+mooncake-store/src/p2p/ha/ha_metric_manager.cpp
+  h_db17cb71b92841 113-114,147-149,424-431,550
+mooncake-store/src/p2p/ha/oplog/p2p_oplog_applier.cpp
+  h_db17cb71b92841 45-46,265-269,327,490-494
+mooncake-store/src/p2p/ha/oplog/redis_oplog_store.cpp
+  h_db17cb71b92841 6,630,668-675,708-711
+mooncake-store/tests/p2p/ha/oplog/oplog_applier_test.cpp
+  h_db17cb71b92841 17,112-146
+mooncake-store/tests/p2p/ha/oplog/redis_oplog_store_test.cpp
+  h_db17cb71b92841 15,19-23,188-204,349-350,363-366,371-372,374-401,442-449,470-473,479-482,488-491,495-540
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8616477b5e9e7718ba0793105dfa334fbce5d840",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
