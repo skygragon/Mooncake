@@ -1,0 +1,14 @@
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 19-24,103-124,138-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "982a3f91fff1be0539d64786b1eb3e03915c1097",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
