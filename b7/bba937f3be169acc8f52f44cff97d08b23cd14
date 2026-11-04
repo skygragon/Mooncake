@@ -1,0 +1,22 @@
+mooncake-store/include/p2p/master/p2p_master_metric_manager.h
+  h_db17cb71b92841 26-31,246-248
+mooncake-store/src/p2p/master/p2p_master_metric_manager.cpp
+  h_db17cb71b92841 20-30,58-60,794-795
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 32-33,97-103
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 4,63-69
+mooncake-store/tests/p2p/p2p_master_metrics_test.cpp
+  h_db17cb71b92841 11,65-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b7bba937f3be169acc8f52f44cff97d08b23cd14",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
