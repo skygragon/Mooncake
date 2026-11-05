@@ -1,0 +1,24 @@
+docs/source/http-api-reference/http-service.md
+  h_db17cb71b92841 65-66,72-78
+mooncake-store/include/p2p/ha/ha_status.h
+  h_db17cb71b92841 6,110-111,116-117,124-131
+mooncake-store/src/p2p/ha/ha_status.cpp
+  h_db17cb71b92841 3,16-18,61,75-78,132,144,155-189,376-379
+mooncake-store/tests/p2p/CMakeLists.txt
+  h_db17cb71b92841 188,201-203
+mooncake-store/tests/p2p/ha/ha_status_test.cpp
+  h_db17cb71b92841 1-100
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 406-422
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c7688465c0bab126d743b5fd6b2a89035e140f48",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
