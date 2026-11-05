@@ -1,0 +1,20 @@
+mooncake-store/include/p2p/ha/ha_metric_manager.h
+  h_db17cb71b92841 77-80,202-207,274-275,319-321
+mooncake-store/src/p2p/ha/ha_metric_manager.cpp
+  h_db17cb71b92841 79-83,202-210,276-277,380-395,601-624,737-738,783-785,832-833,839-841
+mooncake-store/src/p2p/ha/oplog/redis_oplog_trim_worker.cpp
+  h_db17cb71b92841 226,229-233,279-282,308-309,343-347,375
+mooncake-store/tests/p2p/ha/oplog/ha_metric_manager_test.cpp
+  h_db17cb71b92841 52-58,150-152,154-156,187-193,203-204,248-249,295-296,305-306
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1a2e0d35b28dfef279b758d19d3fdb9b6ffa196d",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
