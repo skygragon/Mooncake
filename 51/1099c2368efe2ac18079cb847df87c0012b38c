@@ -1,0 +1,40 @@
+mooncake-store/include/p2p/ha/p2p_master_view.h
+  h_db17cb71b92841 3,25-27,65-67
+mooncake-store/include/p2p/ha/redis_election_helper.h
+  h_db17cb71b92841 93-101,166-167
+mooncake-store/include/p2p/master/p2p_master.h
+  h_db17cb71b92841 3,20-24,26,31-32,35
+mooncake-store/include/p2p/master/p2p_master_service.h
+  h_db17cb71b92841 45
+mooncake-store/include/p2p/master/p2p_rpc_service.h
+  h_db17cb71b92841 4,9,116-117
+mooncake-store/src/p2p/ha/p2p_master_view.cpp
+  h_db17cb71b92841 121,125-132
+mooncake-store/src/p2p/ha/redis_election_helper.cpp
+  h_db17cb71b92841 252-253,296-297,749-781,850,852,908
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 35-47,174-180,213-223,243-245,249,254,264,396-400,402-428,434,444-459,478-492,523-531,681-682,685-686,696-698,767-773,785-794
+mooncake-store/src/p2p/master/p2p_master_service.cpp
+  h_db17cb71b92841 23-29
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 47-52,70-73
+mooncake-store/tests/e2e/process_handler.cpp
+  h_db17cb71b92841 14,130-142,234-266
+mooncake-store/tests/e2e/process_handler.h
+  h_db17cb71b92841 5,46-47,83-85
+mooncake-store/tests/e2e/redis_chaos_test.cpp
+  h_db17cb71b92841 403,413-414,656-792
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 8,297-416,566-585
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "511099c2368efe2ac18079cb847df87c0012b38c",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}

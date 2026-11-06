@@ -1,0 +1,24 @@
+mooncake-store/include/p2p/ha/p2p_master_view.h
+  h_db17cb71b92841 57
+mooncake-store/include/p2p/ha/redis_election_helper.h
+  h_db17cb71b92841 9,38-39,67-72,217
+mooncake-store/src/p2p/ha/p2p_master_view.cpp
+  h_db17cb71b92841 121-125
+mooncake-store/src/p2p/ha/redis_election_helper.cpp
+  h_db17cb71b92841 16,234-237,250-257
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 358-399
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 5,179-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f5d5787f182a7ce711285c7172e32dbcd729862f",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}

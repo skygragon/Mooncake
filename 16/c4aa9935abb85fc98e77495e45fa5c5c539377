@@ -1,0 +1,66 @@
+mooncake-store/src/p2p/ha/oplog/redis_oplog_store.cpp
+  h_db17cb71b92841 6,245,278,289,502,659-666,669-672,686-687,690-693,696,698,700-701,704,708-713,716,752,769,778,784,904,942-949,982-985,1126
+mooncake-store/tests/p2p/ha/oplog/redis_oplog_store_test.cpp
+  h_db17cb71b92841 17,22-26,27,257-258,261,268-275,282-284,554-557,559-591,769-770,783-786,791-792,794-821,824-861,862-869,870-871,890-893,899-902,908-911,915-960
+mooncake-store/include/p2p/ha/oplog/redis_oplog_store.h
+  h_db17cb71b92841 110,114,134
+mooncake-store/include/p2p/ha/ha_metric_manager.h
+  h_db17cb71b92841 155-156,180-181,324
+mooncake-store/include/p2p/ha/oplog/p2p_oplog_types.h
+  h_db17cb71b92841 26-28
+mooncake-store/src/p2p/ha/ha_metric_manager.cpp
+  h_db17cb71b92841 174-175,217-219,641-648,788
+mooncake-store/src/p2p/ha/oplog/p2p_oplog_applier.cpp
+  h_db17cb71b92841 49-50,273-277,335,498-502
+mooncake-store/tests/p2p/ha/oplog/oplog_applier_test.cpp
+  h_db17cb71b92841 17,113-115,118-147
+docs/source/http-api-reference/http-service.md
+  h_db17cb71b92841 137-138,144-150,196-205,206-212,239,240-242
+mooncake-store/src/p2p/ha/oplog/p2p_hot_standby_service.cpp
+  h_db17cb71b92841 348,447-449,466-467,547,550-553,1000-1001,1006-1012
+mooncake-store/src/p2p/ha/oplog/polling_oplog_change_notifier.cpp
+  h_db17cb71b92841 6,61-63,87-92
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 14-15,26,72,96-98,444-475,1292-1419,1421-1426
+mooncake-store/include/p2p/common/p2p_master_config.h
+  h_db17cb71b92841 47,54,55
+mooncake-store/include/p2p/ha/ha_status.h
+  h_db17cb71b92841 3-4,6,9,133,134-135,150,166-168,181-182,188-189,195,196,208-215,216-219,221-222,227,228-232,238
+mooncake-store/src/p2p/ha/ha_status.cpp
+  h_db17cb71b92841 3,16-17,26,195,197,198,203,204,209,210-211,213-216,218,219,227,228,248-249,252,289,301,323-357,498-500,503-516,531-532,534,538-539,587-592,593-596,631,632,658-663,665-667,669-670,672-679,690-707,710-721,726-730,798-799,824,833-834,836,837-838,840
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 24,92-96,207,208-209,217-218,219-220,221,358-377
+mooncake-store/src/p2p/master/p2p_master_main.cpp
+  h_db17cb71b92841 51-54,65-67,68-70,155-158,172-174,175-177,249-250,259-260,261-262
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 41,42-43
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 105-112,442-453,455-458,531-535,537-549,551-552,554-557,559-565,567,569-571,573,575-577,579-585,589-602,604,606-609,611-613,616,618-621,623-636,638-639,641-642,644-666,668,670-671,673,675,677,679-686,688-694,693-694
+mooncake-store/include/p2p/ha/oplog/p2p_hot_standby_service.h
+  h_db17cb71b92841 55
+mooncake-store/tests/p2p/CMakeLists.txt
+  h_db17cb71b92841 65,189,202-204
+mooncake-store/tests/p2p/ha/ha_status_test.cpp
+  h_db17cb71b92841 1-6,8-11,22-26,46-64,71-78,80-83,87-88,90-93,95-98,100-105,107,109,111-113,115-127,129-135,656
+mooncake-store/include/p2p/ha/p2p_election_readiness.h
+  h_db17cb71b92841 1-59
+mooncake-store/src/p2p/CMakeLists.txt
+  h_db17cb71b92841 28
+mooncake-store/src/p2p/ha/p2p_election_readiness.cpp
+  h_db17cb71b92841 1-247
+mooncake-store/tests/e2e/redis_chaos_test.cpp
+  h_db17cb71b92841 575-605,670-690
+mooncake-store/tests/p2p/ha/p2p_election_readiness_test.cpp
+  h_db17cb71b92841 1-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "16c4aa9935abb85fc98e77495e45fa5c5c539377",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
