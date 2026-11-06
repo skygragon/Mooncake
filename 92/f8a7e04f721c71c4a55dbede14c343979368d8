@@ -1,0 +1,14 @@
+mooncake-store/tests/p2p/ha/ha_status_test.cpp
+  h_db17cb71b92841 426-427
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "92f8a7e04f721c71c4a55dbede14c343979368d8",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
