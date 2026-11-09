@@ -1,0 +1,14 @@
+mooncake-store/src/p2p/ha/oplog/p2p_standby_snapshot_service.cpp
+  h_db17cb71b92841 19,701-705,827-833
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ed38f10f545fe8cb8bf31d3fd27ad12317f0a165",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
