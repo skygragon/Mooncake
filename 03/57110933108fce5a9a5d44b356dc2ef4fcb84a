@@ -1,0 +1,22 @@
+mooncake-store/include/p2p/ha/p2p_status_http_server.h
+  h_db17cb71b92841 1-34
+mooncake-store/src/p2p/CMakeLists.txt
+  h_db17cb71b92841 31
+mooncake-store/src/p2p/ha/p2p_status_http_server.cpp
+  h_db17cb71b92841 1-91
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 24,233-238,441-443
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 37,934-971
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0357110933108fce5a9a5d44b356dc2ef4fcb84a",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
