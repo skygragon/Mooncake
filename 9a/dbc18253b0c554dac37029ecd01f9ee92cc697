@@ -1,0 +1,16 @@
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 268
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 38,281-321
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9adbc18253b0c554dac37029ecd01f9ee92cc697",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
