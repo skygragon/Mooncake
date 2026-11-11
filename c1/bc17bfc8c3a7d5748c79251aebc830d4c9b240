@@ -1,0 +1,24 @@
+mooncake-store/include/p2p/ha/oplog/oplog_manager.h
+  h_db17cb71b92841 120-124
+mooncake-store/include/p2p/master/p2p_master_service.h
+  h_db17cb71b92841 153,155-157
+mooncake-store/src/p2p/ha/oplog/oplog_manager.cpp
+  h_db17cb71b92841 141-157
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 64-74,601,613
+mooncake-store/src/p2p/master/p2p_master_service.cpp
+  h_db17cb71b92841 444-452
+mooncake-store/tests/p2p/ha/oplog/oplog_manager_test.cpp
+  h_db17cb71b92841 114-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c1bc17bfc8c3a7d5748c79251aebc830d4c9b240",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
