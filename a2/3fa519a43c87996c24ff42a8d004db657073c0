@@ -1,0 +1,18 @@
+mooncake-store/include/p2p/ha/p2p_master_view.h
+  h_db17cb71b92841 26-27
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 346-351,527-530,892-894
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 161-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a23fa519a43c87996c24ff42a8d004db657073c0",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}

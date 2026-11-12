@@ -1,0 +1,22 @@
+mooncake-store/include/p2p/ha/ha_status.h
+  h_db17cb71b92841 157-163,250-252
+mooncake-store/src/p2p/ha/ha_status.cpp
+  h_db17cb71b92841 117-118,203-205,212-220,648-650,818-830
+mooncake-store/src/p2p/ha/p2p_election_readiness.cpp
+  h_db17cb71b92841 7-8,60,79,91-93,99,106
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 467-468,471-478
+mooncake-store/tests/p2p/ha/ha_status_test.cpp
+  h_db17cb71b92841 376-398
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "21db2c4a6dd13052dbd3ae0990698790d1be66d9",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
