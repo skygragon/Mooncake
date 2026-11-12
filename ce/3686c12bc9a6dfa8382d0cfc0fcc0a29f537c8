@@ -1,0 +1,18 @@
+mooncake-store/include/p2p/master/p2p_rpc_service.h
+  h_db17cb71b92841 10,122-129
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 188-209,211-219
+mooncake-store/tests/p2p/p2p_master_http_endpoints_test.cpp
+  h_db17cb71b92841 21,352-353,391-397,441-447,452-559,638
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ce3686c12bc9a6dfa8382d0cfc0fcc0a29f537c8",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
