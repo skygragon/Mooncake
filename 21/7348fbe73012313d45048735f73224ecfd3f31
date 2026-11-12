@@ -1,0 +1,16 @@
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 881-887
+mooncake-store/tests/e2e/redis_chaos_test.cpp
+  h_db17cb71b92841 4,759-808
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "217348fbe73012313d45048735f73224ecfd3f31",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
