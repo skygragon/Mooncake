@@ -1,0 +1,18 @@
+mooncake-store/src/p2p/ha/oplog/redis_oplog_store.cpp
+  h_db17cb71b92841 315-322
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 418,420-421,423-440,444,446,480-483,507,517-520,522,651-653,655-660,677,726-728
+mooncake-store/tests/p2p/ha/oplog/redis_oplog_store_test.cpp
+  h_db17cb71b92841 493-528
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1ae370c4a7904c9ea59ccc606d9f1767fd044486",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
