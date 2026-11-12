@@ -1,0 +1,236 @@
+.github/workflows/ci-p2p.yml
+  h_db17cb71b92841 4-6,105,231,254,453,527-530,542
+.github/workflows/ci.yml
+  h_db17cb71b92841 3-6,97,205,246,436,510-513,525
+.github/workflows/ci_cu13.yml
+  h_db17cb71b92841 4-5,105-106
+CMakeLists.txt
+  h_db17cb71b92841 7-10,25-31
+mooncake-common/SetupPython.cmake
+  h_db17cb71b92841 1-10
+mooncake-common/common.cmake
+  h_db17cb71b92841 62
+mooncake-common/src/CMakeLists.txt
+  h_db17cb71b92841 16
+mooncake-integration/CMakeLists.txt
+  h_db17cb71b92841 2-13,15,17-18,21-23,25-28,35-44,49-50,52-61,63,65-77,80-82,84-88,91-99,102-124,126-129,131-136,140-141,144-147,149-162,164-177,181-183,186-195,197-200,202-204,207-271
+mooncake-integration/store/store_py.cpp
+  h_db17cb71b92841 13,16,1564,1618,1672-1673,1932-1934
+mooncake-store/CMakeLists.txt
+  h_db17cb71b92841 3-4,38-40
+mooncake-store/benchmarks/CMakeLists.txt
+  h_db17cb71b92841 7-8
+mooncake-store/benchmarks/allocator_bench.cpp
+  h_db17cb71b92841 9
+mooncake-store/include/allocator.h
+  h_db17cb71b92841 12
+mooncake-store/include/client_buffer.h
+  h_db17cb71b92841 10
+mooncake-store/include/client_service.h
+  h_db17cb71b92841 18
+mooncake-store/include/common/client_buffer_allocation.h
+  h_db17cb71b92841 1-47
+mooncake-store/include/common/file_util.h
+  h_db17cb71b92841 1-14
+mooncake-store/include/common/network.h
+  h_db17cb71b92841 1-53
+mooncake-store/include/common/result.h
+  h_db17cb71b92841 1-132
+mooncake-store/include/common/scoped_vlog_timer.h
+  h_db17cb71b92841 13
+mooncake-store/include/common/timestamp.h
+  h_db17cb71b92841 1-14
+mooncake-store/include/dummy_client.h
+  h_db17cb71b92841 9
+mooncake-store/include/file_storage.h
+  h_db17cb71b92841 5
+mooncake-store/include/master_service.h
+  h_db17cb71b92841 24-25
+mooncake-store/include/object_metadata.h
+  h_db17cb71b92841 1-245
+mooncake-store/include/object_runtime_state.h
+  h_db17cb71b92841 1-22
+mooncake-store/include/p2p/client/data_manager.h
+  h_db17cb71b92841 33
+mooncake-store/include/p2p/client/data_manager/v1/data_manager_v1.h
+  h_db17cb71b92841 37
+mooncake-store/include/p2p/client/data_manager_types.h
+  h_db17cb71b92841 24
+mooncake-store/include/p2p/client/p2p_client_config_builder.h
+  h_db17cb71b92841 66,70-71,131,353
+mooncake-store/include/p2p/client/p2p_client_service.h
+  h_db17cb71b92841 25
+mooncake-store/include/p2p/client/route_cache.h
+  h_db17cb71b92841 17,88,90-113
+mooncake-store/include/p2p/master/p2p_master_metric_manager.h
+  h_db17cb71b92841 6
+mooncake-store/include/pyclient.h
+  h_db17cb71b92841 17
+mooncake-store/include/real_client.h
+  h_db17cb71b92841 21
+mooncake-store/include/rpc_helper.h
+  h_db17cb71b92841 11
+mooncake-store/include/shm_helper.h
+  h_db17cb71b92841 1-75
+mooncake-store/include/storage_backend.h
+  h_db17cb71b92841 16
+mooncake-store/src/CMakeLists.txt
+  h_db17cb71b92841 3-4,7-8,10,15-17,23,29-34,36,44-47,49-114,118,124,133-150,152-170,172,175-177,180,193-208,213,215-218,222-253,262-266,269-270,273
+mooncake-store/src/cachelib_memory_allocator/CMakeLists.txt
+  h_db17cb71b92841 5-13
+mooncake-store/src/client_buffer.cpp
+  h_db17cb71b92841 1,12
+mooncake-store/src/client_resources.cpp
+  h_db17cb71b92841 14-15
+mooncake-store/src/client_service.cpp
+  h_db17cb71b92841 21
+mooncake-store/src/common/client_buffer_allocation.cpp
+  h_db17cb71b92841 1-187
+mooncake-store/src/common/file_util.cpp
+  h_db17cb71b92841 1-40
+mooncake-store/src/common/mmap_buffer.cpp
+  h_db17cb71b92841 1-45
+mooncake-store/src/common/network.cpp
+  h_db17cb71b92841 1-109
+mooncake-store/src/dummy_client.cpp
+  h_db17cb71b92841 14,16-17
+mooncake-store/src/master_client.cpp
+  h_db17cb71b92841 16
+mooncake-store/src/master_service.cpp
+  h_db17cb71b92841 10,679-680
+mooncake-store/src/offset_allocator.cpp
+  h_db17cb71b92841 4
+mooncake-store/src/p2p/CMakeLists.txt
+  h_db17cb71b92841 1,5-11,20,37,40,87-95,97,100-135,138-143,164-167,193,196,200
+mooncake-store/src/p2p/client/client_rpc_service.cpp
+  h_db17cb71b92841 12
+mooncake-store/src/p2p/client/data_manager/v1/data_manager_v1.cpp
+  h_db17cb71b92841 20-21
+mooncake-store/src/p2p/client/data_manager/v2/block_pool.cpp
+  h_db17cb71b92841 22
+mooncake-store/src/p2p/client/p2p_client_service.cpp
+  h_db17cb71b92841 22
+mooncake-store/src/p2p/client/p2p_real_client_main.cpp
+  h_db17cb71b92841 44-45
+mooncake-store/src/p2p/client/tiered_cache/tiers/bucket_storage_backend.cpp
+  h_db17cb71b92841 11
+mooncake-store/src/p2p/client/tiered_cache/tiers/dram_tier.cpp
+  h_db17cb71b92841 13
+mooncake-store/src/p2p/client/tiered_cache/tiers/storage_tier.cpp
+  h_db17cb71b92841 10
+mooncake-store/src/p2p/ha/oplog/oplog_serializer.cpp
+  h_db17cb71b92841 12
+mooncake-store/src/p2p/master/client_metrics_aggregator.cpp
+  h_db17cb71b92841 1
+mooncake-store/src/p2p/master/p2p_master_client.cpp
+  h_db17cb71b92841 4
+mooncake-store/src/p2p/master/p2p_rpc_service.cpp
+  h_db17cb71b92841 17
+mooncake-store/src/real_client.cpp
+  h_db17cb71b92841 27,31
+mooncake-store/src/rpc_service.cpp
+  h_db17cb71b92841 22
+mooncake-store/src/shm_helper.cpp
+  h_db17cb71b92841 1-143
+mooncake-store/src/storage_backend.cpp
+  h_db17cb71b92841 19
+mooncake-store/tests/client_buffer_test.cpp
+  h_db17cb71b92841 2
+mooncake-store/tests/client_integration_test.cpp
+  h_db17cb71b92841 18
+mooncake-store/tests/client_replica_buffer_test.cpp
+  h_db17cb71b92841 9
+mooncake-store/tests/e2e/CMakeLists.txt
+  h_db17cb71b92841 76
+mooncake-store/tests/e2e/client_wrapper.cpp
+  h_db17cb71b92841 9
+mooncake-store/tests/e2e/p2p_client_wrapper.cpp
+  h_db17cb71b92841 41
+mooncake-store/tests/non_ha_reconnect_test.cpp
+  h_db17cb71b92841 16
+mooncake-store/tests/offset_allocator_test.cpp
+  h_db17cb71b92841 1
+mooncake-store/tests/p2p/CMakeLists.txt
+  h_db17cb71b92841 47,55,60,196-202,215-225
+mooncake-store/tests/p2p/async_metadata_notifier_test.cpp
+  h_db17cb71b92841 15-16
+mooncake-store/tests/p2p/data_manager_contract_test.cpp
+  h_db17cb71b92841 28
+mooncake-store/tests/p2p/data_manager_v1_test.cpp
+  h_db17cb71b92841 16-17,25
+mooncake-store/tests/p2p/ha_integration_test.cpp
+  h_db17cb71b92841 76-77
+mooncake-store/tests/p2p/heartbeat_dedicated_port_test.cpp
+  h_db17cb71b92841 43
+mooncake-store/tests/p2p/p2p_client_http_endpoints_test.cpp
+  h_db17cb71b92841 26
+mooncake-store/tests/p2p/p2p_client_integration_test.cpp
+  h_db17cb71b92841 27
+mooncake-store/tests/p2p/p2p_client_process_test_helper.h
+  h_db17cb71b92841 17
+mooncake-store/tests/p2p/p2p_master_rpc_test.cpp
+  h_db17cb71b92841 19
+mooncake-store/tests/p2p/peer_client_perf_test.cpp
+  h_db17cb71b92841 28
+mooncake-store/tests/p2p/peer_client_process_test_helper.h
+  h_db17cb71b92841 22
+mooncake-store/tests/p2p/runtime_config_store_test.cpp
+  h_db17cb71b92841 12
+mooncake-store/tests/p2p/stress_single_workload_runner.py
+  h_db17cb71b92841 165,253-254
+mooncake-store/tests/p2p/stress_workload_test.cpp
+  h_db17cb71b92841 47-48
+mooncake-store/tests/p2p/v2/data_manager_transfer_test.cpp
+  h_db17cb71b92841 18
+mooncake-store/tests/p2p/v2/transfer_coordinator_test.cpp
+  h_db17cb71b92841 14
+mooncake-store/tests/real_client_deployment_test.cpp
+  h_db17cb71b92841 24
+mooncake-store/tests/shm_helper_test.cpp
+  h_db17cb71b92841 8
+mooncake-store/tests/storage_backend_test.cpp
+  h_db17cb71b92841 7,18
+mooncake-store/tests/stress_workload_test.cpp
+  h_db17cb71b92841 18
+mooncake-store/tests/test_server_helpers.h
+  h_db17cb71b92841 13
+mooncake-store/tests/utils_test.cpp
+  h_db17cb71b92841 1
+mooncake-transfer-engine/CMakeLists.txt
+  h_db17cb71b92841 12-14
+mooncake-transfer-engine/src/CMakeLists.txt
+  h_db17cb71b92841 12
+mooncake-transfer-engine/src/transport/rpc_communicator/CMakeLists.txt
+  h_db17cb71b92841 3,7-14,17-18
+mooncake-wheel/mooncake/mooncake_store_service.py
+  h_db17cb71b92841 365-370,372
+mooncake-wheel/pyproject.toml
+  h_db17cb71b92841 1-19,21,26-27,31-39,43,46-48,55,67
+mooncake-wheel/setup.py
+  h_db17cb71b92841 1-2,7-100,264
+pyproject.toml
+  h_db17cb71b92841 1-120
+python/CMakeLists.txt
+  h_db17cb71b92841 1-15
+python/mooncake/__init__.py
+  h_db17cb71b92841 1-13
+python/mooncake/_launcher.py
+  h_db17cb71b92841 1-55
+python/mooncake/store/__init__.py
+  h_db17cb71b92841 1-136
+scripts/build_wheel.sh
+  h_db17cb71b92841 15-38,49,63-69,75-76,78,87-94,138-140,142,185-221,225-264,271-273,275,280-283,293-306,366-368,370-373
+scripts/test_installation.sh
+  h_db17cb71b92841 4,36,38-46,51-53,63,75-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5fb8d37365194e4feba6238c8f8af01d0d93d349",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
