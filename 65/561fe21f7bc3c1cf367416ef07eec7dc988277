@@ -1,0 +1,24 @@
+mooncake-store/include/p2p/ha/oplog/p2p_hot_standby_service.h
+  h_db17cb71b92841 70-79
+mooncake-store/src/p2p/ha/oplog/p2p_hot_standby_service.cpp
+  h_db17cb71b92841 36-37,39-55,58-63,65-66,159,181,187-189,292-294,302,324-325,646-650,670-677,681-690,702-703,710-714,721-726,731-736,753-758,766-772,777-782,799-802,866-875,885-887,896-911,1020,1045,1091-1100
+mooncake-store/src/p2p/ha/oplog/p2p_oplog_applier.cpp
+  h_db17cb71b92841 222,254,385-387,404,423-425,523-524,545-548,552-554,654-656,685-687
+mooncake-store/src/p2p/ha/oplog/p2p_standby_metadata_store.cpp
+  h_db17cb71b92841 68,78,91,98,101,126,149,162,169,185,196
+mooncake-store/src/p2p/ha/oplog/p2p_standby_snapshot_service.cpp
+  h_db17cb71b92841 98-102,128-132,141-145,155-160,169-173,181-188,314,317-322,329-331,339-341,349-352,361-365,374-377,402-408,415,452-457,466-471,492-495,652-654,678-681,685-688
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 9,60-64,69-91,999-1007,1023-1031,1043-1071,1075-1148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "65561fe21f7bc3c1cf367416ef07eec7dc988277",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
