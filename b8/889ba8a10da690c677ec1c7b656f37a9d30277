@@ -1,0 +1,28 @@
+mooncake-integration/store/store_py.cpp
+  h_db17cb71b92841 1581-1582,1607,1609,1637,1694-1696
+mooncake-store/include/p2p/client/p2p_client_config_builder.h
+  h_db17cb71b92841 3,7,23-24,156-162,237,311-322,338,402-403
+mooncake-store/include/p2p/master/p2p_master_client.h
+  h_db17cb71b92841 54-57,317
+mooncake-store/src/p2p/client/p2p_client_service.cpp
+  h_db17cb71b92841 439-445
+mooncake-store/src/p2p/client/p2p_real_client_main.cpp
+  h_db17cb71b92841 36-45,148-149
+mooncake-store/src/p2p/master/p2p_master_client.cpp
+  h_db17cb71b92841 23,25-40,162-174,418
+mooncake-store/tests/p2p/client_config_builder_test.cpp
+  h_db17cb71b92841 74-95
+mooncake-store/tests/p2p/heartbeat_dedicated_port_test.cpp
+  h_db17cb71b92841 49,131-151,154-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b8889ba8a10da690c677ec1c7b656f37a9d30277",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
