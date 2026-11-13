@@ -1,0 +1,14 @@
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 1868-1920
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d5cae04977a30b495110b01c66bfbd86cc678440",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
