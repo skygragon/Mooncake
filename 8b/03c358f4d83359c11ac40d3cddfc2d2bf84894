@@ -1,0 +1,14 @@
+mooncake-store/tests/e2e/redis_chaos_test.cpp
+  h_db17cb71b92841 1125-1156,1197-1233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8b03c358f4d83359c11ac40d3cddfc2d2bf84894",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
