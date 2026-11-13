@@ -1,0 +1,22 @@
+mooncake-store/include/p2p/master/p2p_master.h
+  h_db17cb71b92841 7,36,39-40
+mooncake-store/src/p2p/master/p2p_master.cpp
+  h_db17cb71b92841 54-67,250,253-277,313-315,317,323-325,328-332,399,452-453,472,559-560,742-744,821-823,844-846,865-870,908-910,949,957-961,969-978,1055-1057,1069
+mooncake-store/tests/p2p/p2p_master_rpc_test.cpp
+  h_db17cb71b92841 550-619
+mooncake-store/tests/p2p/redis_election_helper_test.cpp
+  h_db17cb71b92841 103-136,176,183,231-289
+mooncake-store/src/p2p/ha/oplog/p2p_hot_standby_service.cpp
+  h_db17cb71b92841 896-913
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "08ef24650aaf970b20bcff02ac84446f28d5b25a",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
