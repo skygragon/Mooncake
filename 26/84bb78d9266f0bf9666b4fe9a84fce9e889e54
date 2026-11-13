@@ -1,0 +1,14 @@
+mooncake-store/tests/p2p/ha/oplog/oplog_replicator_test.cpp
+  h_db17cb71b92841 146,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2684bb78d9266f0bf9666b4fe9a84fce9e889e54",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
