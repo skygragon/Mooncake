@@ -1,0 +1,22 @@
+mooncake-store/include/p2p/master/p2p_client_manager.h
+  h_db17cb71b92841 23,86
+mooncake-store/tests/e2e/redis_chaos_test.cpp
+  h_db17cb71b92841 1343
+mooncake-store/tests/p2p/ha/ha_status_test.cpp
+  h_db17cb71b92841 473
+mooncake-store/tests/p2p/ha/oplog/p2p_hot_standby_service_test.cpp
+  h_db17cb71b92841 505,845,932
+mooncake-store/tests/p2p/ha/oplog/p2p_record_oplog_test.cpp
+  h_db17cb71b92841 26,91,210,240,249,277,281,296,303,307,332,359,393,418,453,474,498,522,563,599-600,620,641,664,676
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1f3ce146fc6da293e278fa78024f9e60f824c316",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
