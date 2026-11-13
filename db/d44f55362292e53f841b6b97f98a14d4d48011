@@ -1,0 +1,14 @@
+mooncake-store/tests/e2e/CMakeLists.txt
+  h_db17cb71b92841 91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "dbd44f55362292e53f841b6b97f98a14d4d48011",
+  "prompts": {},
+  "humans": {
+    "h_db17cb71b92841": {
+      "author": "wl177541 <wl177541@antgroup.com>"
+    }
+  }
+}
